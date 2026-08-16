@@ -1,6 +1,14 @@
 package models
 
+import "time"
+
 type Score struct {
-	User_id int
-	Score int
+	UserID    int
+	Score     int
+	CreatedAt time.Time
+}
+
+type ScoreWithUsername struct {
+	Username string `json:"username"`
+	Score    int    `json:"score"`
 }

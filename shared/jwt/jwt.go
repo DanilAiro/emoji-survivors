@@ -2,18 +2,15 @@ package jwt
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var secretKey = []byte(os.Getenv("JWT_SECRET"))
-
-func CreateToken(email string) (string, error) {
+func CreateToken(secretKey, sub string) (string, error) {
 	// Create claims with standard and custom fields
 	claims := jwt.MapClaims{
-		"sub": email,                                 // Subject
+		"sub": sub,                                 // Subject
 		"exp": time.Now().Add(time.Hour * 24).Unix(), // Expiration
 		"iat": time.Now().Unix(),                     // Issued At
 	}
@@ -25,7 +22,7 @@ func CreateToken(email string) (string, error) {
 	return token.SignedString(secretKey)
 }
 
-func VerifyToken(tokenString string) (jwt.MapClaims, error) {
+func VerifyToken(secretKey, tokenString string) (jwt.MapClaims, error) {
 	// Parse the token
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Ensure the signing method is what you expect (HMAC in this case)

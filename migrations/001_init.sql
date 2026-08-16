@@ -12,10 +12,3 @@ CREATE TABLE IF NOT EXISTS scores (
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
-
-UPDATE scores 
-SET 
-    score = 1, 
-    updated_at = now()
-WHERE 
-    user_id = 2 AND score < 1

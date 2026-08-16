@@ -5,9 +5,8 @@ import (
 	"log"
 )
 
-func ConnectDB() *sql.DB {
-	connStr := "user=* password=* dbname=* sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
+func ConnectDB(DBUrl string) *sql.DB {
+	db, err := sql.Open("postgres", DBUrl)
 
 	if (err != nil) {
 		log.Fatal("неудалось подключиться к базе данных")
