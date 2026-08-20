@@ -58,7 +58,7 @@ func (g *GameLoop) resolveAttack(p *ws.Player) {
 
 func (g *GameLoop) resolveMobDamage(p *ws.Player) {
 	for _, m := range g.mobs {
-		if CirclesOverlap(m.X, m.Y, MobRadius, p.X, p.Y, ws.PlayerRadius) {
+		if CirclesOverlap(m.X, m.Y, MobRadius, p.X, p.Y, ws.Radius) {
 			p.HP -= MobDamagePerTick
 		}
 	}
@@ -72,8 +72,8 @@ func movePlayer(p *ws.Player, dx, dy, dt float64) {
 
 	dx, dy = dx/length, dy/length
 
-	p.X = clamp(p.X+dx*ws.PlayerSpeed*dt, 0, MapWidth)
-	p.Y = clamp(p.Y+dy*ws.PlayerSpeed*dt, 0, MapHeight)
+	p.X = clamp(p.X+dx*ws.Speed*dt, 0, MapWidth)
+	p.Y = clamp(p.Y+dy*ws.Speed*dt, 0, MapHeight)
 }
 
 func clamp(v, min, max float64) float64 {
@@ -88,7 +88,7 @@ func clamp(v, min, max float64) float64 {
 	return v
 }
 
-func NearestPlayer(x, y float64, players []*ws.Player) *ws.Player {
+func nearestPlayer(x, y float64, players []*ws.Player) *ws.Player {
 	var nearestP *ws.Player
 	minDist := math.MaxFloat64
 
@@ -97,7 +97,7 @@ func NearestPlayer(x, y float64, players []*ws.Player) *ws.Player {
 			continue
 		}
 
-		dist := math.Hypot(p.X - x, p.Y - y)
+		dist := math.Hypot(p.X-x, p.Y-y)
 
 		if dist < minDist {
 			nearestP = p
@@ -106,4 +106,118 @@ func NearestPlayer(x, y float64, players []*ws.Player) *ws.Player {
 	}
 
 	return nearestP
+}
+
+func (g *GameLoop) broadcastState() {
+	players := g.hub.Players()
+
+	state := GameState{
+		Type:    "state",
+		Players: make([]PlayerSnapshot, 0, len(players)),
+		Mobs:    make([]MobSnapshot, 0, len(g.mobs)),
+	}
+
+	for _, p := range players {
+		state.Players = append(state.Players, PlayerSnapshot{
+			UserID:   p.UserID,
+			Username: p.Username,
+			X:        p.X,
+			Y:        p.Y,
+			HP:       p.HP,
+			Kills:    p.Kills,
+		})
+	}
+	for _, m := range g.mobs {
+		state.Mobs = append(state.Mobs, MobSnapshot{ID: m.ID, X: m.X, Y: m.Y, HP: m.HP})
+	}
+
+	data, err := json.Marshal(state)
+	if err != nil {
+		log.Printf("не удалось сериализовать состояние игры: %v", err)
+		return
+	}
+
+	for _, p := range players {
+		p.Send(data)
+	}
+}
+
+func (g *GameLoop) Run(ctx context.Context) {
+	ticker := time.NewTicker(time.Second / TickRate)
+	defer ticker.Stop()
+
+	dt := 1.0 / float64(TickRate)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			g.tick(dt)
+		}
+	}
+}
+
+func (g *GameLoop) tick(dt float64) {
+	playerCount := g.hub.Count()
+
+	g.spawnMobs(playerCount)
+	g.moveMobs(dt)
+	g.handlePlayers()
+	g.broadcastState()
+}
+
+func (g *GameLoop) spawnMobs(playerCount int) {
+	if playerCount == 0 {
+		return
+	}
+
+	desired := BaseMobCount * playerCount
+	for len(g.mobs) < desired {
+		g.nextMobID++
+		g.mobs[g.nextMobID] = &Mob{
+			ID: g.nextMobID,
+			X:  rand.Float64() * MapWidth,
+			Y:  rand.Float64() * MapHeight,
+			HP: MobStartHP,
+		}
+	}
+}
+
+func (g *GameLoop) moveMobs(dt float64) {
+	players := g.hub.Players()
+	if len(players) == 0 {
+		return
+	}
+
+	for _, m := range g.mobs {
+		target := nearestPlayer(m.X, m.Y, players)
+		if target != nil {
+			m.MoveToward(target.X, target.Y, dt)
+		}
+	}
+}
+
+func (g *GameLoop) handlePlayers() {
+	dt := 1.0 / float64(TickRate)
+	players := g.hub.Players()
+
+	for _, p := range players {
+		if p.HP <= 0 {
+			continue
+		}
+
+		dx, dy, attack := p.ConsumeInput()
+		movePlayer(p, dx, dy, dt)
+
+		if attack {
+			g.resolveAttack(p)
+		}
+
+		g.resolveMobDamage(p)
+
+		if p.HP <= 0 {
+			g.onPlayerDeath(p)
+		}
+	}
 }
