@@ -26,8 +26,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/register", handlers.RegisterHandler(userRepo))
-	mux.HandleFunc("GET /api/login", handlers.LoginHandler(userRepo, cfg.JWTSecret))
-	mux.HandleFunc("GET /api/stats", handlers.StatsHandler(scoreRepo))
+	mux.HandleFunc("POST /api/login", handlers.LoginHandler(userRepo, cfg.Secret))
+	mux.HandleFunc("GET /api/stats", handlers.StatsHandler(scoreRepo, cfg.Secret))
 
 	addr := ":" + cfg.Port
 	log.Printf("auth-service запущен на %s", addr)

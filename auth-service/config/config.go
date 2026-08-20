@@ -7,21 +7,21 @@ import (
 
 type Config struct {
 	DBUrl     string
-	JWTSecret string
+	Secret string
 	Port      string
 }
 
 func Load() (Config, error) {
 	cfg := Config{
 		DBUrl:     os.Getenv("DB_URL"),
-		JWTSecret: os.Getenv("JWT_SECRET"),
+		Secret: os.Getenv("JWT_SECRET"),
 		Port:      os.Getenv("PORT"),
 	}
 
 	if cfg.DBUrl == "" {
 		return cfg, fmt.Errorf("переменная окружения DB_URL не задана")
 	}
-	if cfg.JWTSecret == "" {
+	if cfg.Secret == "" {
 		return cfg, fmt.Errorf("переменная окружения JWT_SECRET не задана")
 	}
 	if cfg.Port == "" {

@@ -1,45 +1,63 @@
 package jwt
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func CreateToken(secretKey, sub string) (string, error) {
-	// Create claims with standard and custom fields
-	claims := jwt.MapClaims{
-		"sub": sub,                                 // Subject
-		"exp": time.Now().Add(time.Hour * 24).Unix(), // Expiration
-		"iat": time.Now().Unix(),                     // Issued At
+const (
+	TokenTTL = time.Hour * 24
+)
+
+var (
+	ErrInvalidToker = errors.New("невалидный токен")
+)
+
+type Claims struct {
+	UserID   int    `json:"user_id"`
+	Username string `json:"username"`
+	jwt.RegisteredClaims
+}
+
+func CreateToken(userID int, username, secretKey string) (string, error) {
+	claims := Claims{
+		UserID: userID,
+		Username: username,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenTTL)),
+			IssuedAt: jwt.NewNumericDate(time.Now()),
+		},
 	}
 
 	// Create token with HS256 algorithm and claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Sign the token with the secret key
-	return token.SignedString(secretKey)
+	return token.SignedString([]byte(secretKey))
 }
 
-func VerifyToken(secretKey, tokenString string) (jwt.MapClaims, error) {
+func VerifyToken(secretKey, tokenString string) (*Claims, error) {
+	claims := &Claims{}
+	
 	// Parse the token
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		// Ensure the signing method is what you expect (HMAC in this case)
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return secretKey, nil
+		return []byte(secretKey), nil
 	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	// Check if the token is valid and extract claims
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return claims, nil
+	if !token.Valid {
+		return nil, ErrInvalidToker
 	}
 
-	return nil, fmt.Errorf("invalid token")
+	return claims, nil
 }

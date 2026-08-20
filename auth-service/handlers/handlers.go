@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"emoji-survivors/auth-service/models"
 	"emoji-survivors/auth-service/repository"
 	"encoding/json"
 	"net/http"
@@ -11,8 +12,23 @@ import (
 )
 
 type RequestData struct {
+	UserID   int    `json:"user_id"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type ResultResponse struct {
+	Result string `json:"result"`
+}
+
+type LoginResponse struct {
+	ResultResponse
+	Token string `json:"token"`
+}
+
+type StatisticsResponse struct {
+	ResultResponse
+	Statistics []models.ScoreWithUsername `json:"statistics"`
 }
 
 func RegisterHandler(userRepo *repository.UserRepository) func(http.ResponseWriter, *http.Request) {
@@ -40,13 +56,13 @@ func RegisterHandler(userRepo *repository.UserRepository) func(http.ResponseWrit
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{
-			"result": "Успешная регистрация!",
+		json.NewEncoder(w).Encode(ResultResponse{
+			Result: "Успешная регистрация!",
 		})
 	}
 }
 
-func LoginHandler(userRepo *repository.UserRepository, JWTSecret string) func(http.ResponseWriter, *http.Request) {
+func LoginHandler(userRepo *repository.UserRepository, secret string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 		defer r.Body.Close()
@@ -71,7 +87,7 @@ func LoginHandler(userRepo *repository.UserRepository, JWTSecret string) func(ht
 			return
 		}
 
-		jwtToken, err := jwt.CreateToken(JWTSecret, rd.Username)
+		token, err := jwt.CreateToken(rd.UserID, rd.Username, secret)
 		if err != nil {
 			http.Error(w, "Упс, что-то сломалось", http.StatusInternalServerError)
 			return
@@ -79,15 +95,42 @@ func LoginHandler(userRepo *repository.UserRepository, JWTSecret string) func(ht
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{
-			"result": "Успешный логин!",
-			"jwt":    jwtToken,
+		json.NewEncoder(w).Encode(LoginResponse{
+			ResultResponse: ResultResponse{
+				Result: "Успешный логин!",
+			},
+			Token: token,
 		})
 	}
 }
 
-func StatsHandler(scoreRepo *repository.ScoreRepository) func(http.ResponseWriter, *http.Request) {
+func StatsHandler(scoreRepo *repository.ScoreRepository, secret string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		token := r.URL.Query().Get("token")
+		if token == "" {
+			http.Error(w, "отсутствует токен", http.StatusUnauthorized)
+			return
+		}
 
+		_, err := jwt.VerifyToken(token, secret)
+		if err != nil {
+			http.Error(w, "невалидный или истёкший токен", http.StatusUnauthorized)
+			return
+		}
+
+		statistics, err := scoreRepo.GetTop10(r.Context())
+		if err != nil {
+			http.Error(w, "Упс, что-то сломалось", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(StatisticsResponse{
+			ResultResponse: ResultResponse{
+				Result: "Успешный запрос статистики!",
+			},
+			Statistics: statistics,
+		})
 	}
 }
