@@ -1,11 +1,11 @@
-package authservice
+package main
 
 import (
 	"emoji-survivors/auth-service/config"
 	"emoji-survivors/auth-service/db"
+	"emoji-survivors/auth-service/handlers"
 	"emoji-survivors/auth-service/initializers"
 	"emoji-survivors/auth-service/repository"
-	"emoji-survivors/auth-service/handlers"
 	"log"
 	"net/http"
 )

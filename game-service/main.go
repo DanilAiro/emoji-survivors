@@ -1,4 +1,4 @@
-package gameservice
+package main
 
 import (
 	"context"

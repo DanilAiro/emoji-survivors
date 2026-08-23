@@ -1,6 +1,5 @@
-version: "3.9"
-
 services:
+
   postgres:
     image: postgres:16-alpine
     environment:
@@ -13,7 +12,11 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d $${POSTGRES_DB}"
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -53,7 +56,11 @@ services:
       - ./frontend:/app
     ports:
       - "3000:3000"
-    command: ["python3", "-m", "http.server", "3000"]
+    command:
+      - python3
+      - -m
+      - http.server
+      - "3000"
 
 volumes:
   pgdata:
