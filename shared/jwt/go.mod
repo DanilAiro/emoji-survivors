@@ -1,4 +1,4 @@
-module emoji-survivors/shared
+module emoji-survivors/shared/jwt
 
 go 1.23.3
 

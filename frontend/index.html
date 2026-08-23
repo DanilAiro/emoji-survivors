@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <title>Emoji Survivor</title>
+  </head>
+  <body>
+    <div id="auth-screen">
+      <div class="card">
+        <div class="logo">🙂🗡👾</div>
+        <h1>EMOJI SURVIVOR</h1>
+        <div class="tabs">
+          <div class="tab active" data-mode="login">Вход</div>
+          <div class="tab" data-mode="register">Регистрация</div>
+        </div>
+        <input
+          id="username"
+          type="text"
+          placeholder="Имя пользователя"
+          autocomplete="username"
+        />
+        <input
+          id="password"
+          type="password"
+          placeholder="Пароль"
+          autocomplete="current-password"
+        />
+        <button class="primary" id="submit-btn">Войти</button>
+        <div id="auth-error"></div>
+      </div>
+    </div>
+
+    <div id="game-screen">
+      <div id="hud">
+        <div>👤 <b id="hud-username">-</b></div>
+        <div>
+          ❤️
+          <div class="hp-bar-wrap"><div id="hp-bar"></div></div>
+        </div>
+        <div>💀 килы: <b id="hud-kills">0</b></div>
+        <div>🌐 <b id="hud-players">0</b> игроков</div>
+      </div>
+
+      <div id="canvas-wrap">
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        <div id="death-overlay">
+          <h2>Ты погиб 💀</h2>
+          <div>Убито мобов: <b id="death-kills">0</b></div>
+        </div>
+      </div>
+
+      <div id="hint">WASD / стрелки — двигаться · Пробел или клик - атака</div>
+    </div>
+  </body>
+</html>

@@ -31,7 +31,7 @@ func main() {
 
 	addr := ":" + cfg.Port
 	log.Printf("auth-service запущен на %s", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	if err := http.ListenAndServe(addr, handlers.WithCORS(mux)); err != nil {
 		log.Fatalf("сервер завершился с ошибкой: %v", err)
 	}
 }

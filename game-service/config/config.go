@@ -25,7 +25,7 @@ func Load() (Config, error) {
 		return cfg, fmt.Errorf("переменная окружения JWT_SECRET не задана")
 	}
 	if cfg.Port == "" {
-		cfg.Port = "8081"
+		cfg.Port = "8082"
 	}
 
 	return cfg, nil
