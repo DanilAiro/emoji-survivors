@@ -14,10 +14,13 @@ func NewScoreRepository(db *sql.DB) *ScoreRepository {
 	return &ScoreRepository{db}
 }
 
-// обновить до UpdateIfHigher
-func (r *ScoreRepository) Update(ctx context.Context, user_id, score int) error {
-	_, err := r.db.ExecContext(ctx, `UPDATE INTO scores (user_id, score, updated_at)
-		VALUES ($1, $2, NOW())`, user_id, score)
+func (r *ScoreRepository) UpdateIfHigher(ctx context.Context, user_id, score int) error {
+	_, err := r.db.ExecContext(
+		ctx,
+		`UPDATE scores SET score = $2, updated_at = now()
+     	WHERE user_id = $1 AND score < $2`,
+		user_id,
+		score)
 	if err != nil {
 		return fmt.Errorf("не удалось обновить счёт игрока %d: %w", user_id, err)
 	}

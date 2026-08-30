@@ -21,7 +21,13 @@ func main() {
 		log.Fatalf("ошибка конфигурации: %v", err)
 	}
 
-	conn := db.ConnectDB(cfg.DBUrl)
+	conn, err := db.ConnectDB(cfg.DBUrl)
+	if err == db.ErrNoConnect || err == db.ErrNoPing {
+		log.Fatal(err.Error())
+	}
+	if err != nil {
+		log.Fatalf("ошибка подключения к базе: %v", err)
+	}
 	defer conn.Close()
 
 	scoreRepo := repository.NewScoreRepository(conn)

@@ -2,22 +2,25 @@ package db
 
 import (
 	"database/sql"
-	"log"
+	"errors"
 
 	_ "github.com/lib/pq"
 )
 
-func ConnectDB(DBUrl string) *sql.DB {
+var ErrNoConnect = errors.New("неудалось подключиться к базе данных")
+var ErrNoPing = errors.New("база данных недоступна")
+
+func ConnectDB(DBUrl string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", DBUrl)
 
 	if err != nil {
-		log.Fatalf("не удалось открыть подключение к базе данных: %v", err)
+		return nil, err
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatalf("база данных недоступна: %v", err)
+		return nil, err
 	}
 
-	return db
+	return db, nil
 }

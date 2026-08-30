@@ -41,7 +41,7 @@ func (g *GameLoop) onPlayerDeath(p *ws.Player) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	err := g.scoreRepo.Update(ctx, p.UserID, p.Kills)
+	err := g.scoreRepo.UpdateIfHigher(ctx, p.UserID, p.Kills)
 	if err != nil {
 		log.Printf("Не удалось сохранить новые данные пользователя %d - %d очков", p.UserID, p.Kills)
 	}
@@ -93,7 +93,7 @@ func nearestPlayer(x, y float64, players []*ws.Player) *ws.Player {
 	minDist := math.MaxFloat64
 
 	for _, p := range players {
-		if p.HP < 0 {
+		if p.HP <= 0 {
 			continue
 		}
 

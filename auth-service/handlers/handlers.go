@@ -12,7 +12,6 @@ import (
 )
 
 type RequestData struct {
-	UserID   int    `json:"user_id"`
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
@@ -87,7 +86,7 @@ func LoginHandler(userRepo *repository.UserRepository, secret string) func(http.
 			return
 		}
 
-		token, err := jwt.CreateToken(rd.UserID, rd.Username, secret)
+		token, err := jwt.CreateToken(user.ID, user.Username, secret)
 		if err != nil {
 			http.Error(w, "Упс, что-то сломалось", http.StatusInternalServerError)
 			return
@@ -104,17 +103,11 @@ func LoginHandler(userRepo *repository.UserRepository, secret string) func(http.
 	}
 }
 
-func StatsHandler(scoreRepo *repository.ScoreRepository, secret string) func(http.ResponseWriter, *http.Request) {
+func StatsHandler(scoreRepo *repository.ScoreRepository) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("token")
 		if token == "" {
 			http.Error(w, "отсутствует токен", http.StatusUnauthorized)
-			return
-		}
-
-		_, err := jwt.VerifyToken(token, secret)
-		if err != nil {
-			http.Error(w, "невалидный или истёкший токен", http.StatusUnauthorized)
 			return
 		}
 

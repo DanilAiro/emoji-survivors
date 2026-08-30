@@ -24,7 +24,7 @@ func WSConnectHandler(hub *ws.Hub, jwtSecret string) http.HandlerFunc {
 			return
 		}
 
-		claims, err := appjwt.VerifyToken(token, jwtSecret)
+		claims, err := appjwt.VerifyToken(jwtSecret, token)
 		if err != nil {
 			http.Error(w, "невалидный или истёкший токен", http.StatusUnauthorized)
 			return

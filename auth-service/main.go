@@ -18,7 +18,13 @@ func main() {
 		log.Fatalf("ошибка конфигурации: %v", err)
 	}
 
-	conn := db.ConnectDB(cfg.DBUrl)
+	conn, err := db.ConnectDB(cfg.DBUrl)
+	if err == db.ErrNoConnect || err == db.ErrNoPing {
+		log.Fatal(err.Error())
+	}
+	if err != nil {
+		log.Fatalf("ошибка подключения к базе: %v", err)
+	}
 	defer conn.Close()
 
 	userRepo := repository.NewUserRepository(conn)
@@ -27,7 +33,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/register", handlers.RegisterHandler(userRepo))
 	mux.HandleFunc("POST /api/login", handlers.LoginHandler(userRepo, cfg.Secret))
-	mux.HandleFunc("GET /api/stats", handlers.StatsHandler(scoreRepo, cfg.Secret))
+	mux.HandleFunc("GET /api/stats", handlers.StatsHandler(scoreRepo))
 
 	addr := ":" + cfg.Port
 	log.Printf("auth-service запущен на %s", addr)
