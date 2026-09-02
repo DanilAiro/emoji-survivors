@@ -51,16 +51,11 @@ services:
       - ./frontend:/app
     ports:
       - "3000:3000"
-    environment:
-      - API_HOST=${API_HOST}
-      - GAME_HOST=${GAME_HOST}
-      - API_PORT=${AUTH_SERVICE_PORT}
-      - GAME_PORT=${GAME_SERVICE_PORT}
     command: >
       sh -c '
         echo "window.APP_CONFIG = {" > /app/config.js;
-        echo "  AUTH_URL: \"http://${API_HOST}:${API_PORT}\"," >> /app/config.js;
-        echo "  GAME_WS_URL: \"ws://${GAME_HOST}:${GAME_PORT}/ws/connect\"" >> /app/config.js;
+        echo "  AUTH_URL: \"http://${API_HOST}:${AUTH_SERVICE_PORT}\"," >> /app/config.js;
+        echo "  GAME_WS_URL: \"ws://${GAME_HOST}:${GAME_SERVICE_PORT}/ws/connect\"" >> /app/config.js;
         echo "};" >> /app/config.js;
         exec python3 -m http.server 3000
       '
