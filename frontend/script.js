@@ -56,24 +56,24 @@ document.addEventListener("DOMContentLoaded", () => {
           const body = await safeJson(res);
           throw new Error(body?.error || `Ошибка регистрации (${res.status})`);
         }
-        // после успешной регистрации сразу логинимся
       }
 
-      const loginRes = await fetch(`${AUTH_URL}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-      if (!loginRes.ok) {
-        const body = await safeJson(loginRes);
-        throw new Error(body?.error || `Ошибка входа (${loginRes.status})`);
+      if (mode === "login") {
+        const loginRes = await fetch(`${AUTH_URL}/api/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        if (!loginRes.ok) {
+          const body = await safeJson(loginRes);
+          throw new Error(body?.error || `Ошибка входа (${loginRes.status})`);
+        }
+
+        const { token } = await loginRes.json();
+        localStorage.setItem("emoji_survivor_token", token);
+        localStorage.setItem("emoji_survivor_username", username);
+        startGame(token, username);
       }
-
-      const { token } = await loginRes.json();
-      localStorage.setItem("emoji_survivor_token", token);
-      localStorage.setItem("emoji_survivor_username", username);
-
-      startGame(token, username);
     } catch (err) {
       authError.textContent = err.message || "Что-то пошло не так";
     } finally {
