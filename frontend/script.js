@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // ==================== Экран аутентификации ====================
+
   const AUTH_URL = window.APP_CONFIG.AUTH_URL;
   const GAME_WS_URL = window.APP_CONFIG.GAME_WS_URL;
 
@@ -11,6 +13,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const authError = document.getElementById("auth-error");
 
   let mode = "login"; // "login" | "register"
+
+  // ==================== Игровой экран ====================
+
+  const canvas = document.getElementById("game-canvas");
+  const ctx = canvas.getContext("2d");
+  const hudUsername = document.getElementById("hud-username");
+  const hudKills = document.getElementById("hud-kills");
+  const hudPlayers = document.getElementById("hud-players");
+  const hpBar = document.getElementById("hp-bar");
+  const deathOverlay = document.getElementById("death-overlay");
+  const deathKills = document.getElementById("death-kills");
+
+  let socket = null;
+  let myUserId = null;
+  let latestState = { players: [], mobs: [] };
+
+  // ==================== Экран аутентификации ====================
 
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
@@ -113,19 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==================== Игровой экран ====================
-
-  const canvas = document.getElementById("game-canvas");
-  const ctx = canvas.getContext("2d");
-  const hudUsername = document.getElementById("hud-username");
-  const hudKills = document.getElementById("hud-kills");
-  const hudPlayers = document.getElementById("hud-players");
-  const hpBar = document.getElementById("hp-bar");
-  const deathOverlay = document.getElementById("death-overlay");
-  const deathKills = document.getElementById("death-kills");
-
-  let socket = null;
-  let myUserId = null;
-  let latestState = { players: [], mobs: [] };
 
   function startGame(token, username) {
     authScreen.style.display = "none";
