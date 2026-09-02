@@ -56,6 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const body = await safeJson(res);
           throw new Error(body?.error || `Ошибка регистрации (${res.status})`);
         }
+
+        autoSwitchTab();
       }
 
       if (mode === "login") {
@@ -99,6 +101,12 @@ document.addEventListener("DOMContentLoaded", () => {
       startGame(token, username);
     }
   })();
+
+  function autoSwitchTab() {
+    tabs.forEach(t => {
+      if (!t.classList.contains("active")) t.click();
+    });
+  }
 
   // ==================== Игровой экран ====================
 
