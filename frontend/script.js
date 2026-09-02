@@ -103,8 +103,12 @@ document.addEventListener("DOMContentLoaded", () => {
   })();
 
   function autoSwitchTab() {
+    let isFinish = false;
     tabs.forEach(t => {
-      if (!t.classList.contains("active")) t.click();
+      if (!t.classList.contains("active") && !finish) {
+          t.click();
+          isFinish = true;
+      }
     });
   }
 
