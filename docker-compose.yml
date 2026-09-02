@@ -1,5 +1,4 @@
 services:
-
   postgres:
     image: postgres:16-alpine
     environment:
@@ -12,11 +11,7 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER} -d $${POSTGRES_DB}"
-        ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -56,11 +51,19 @@ services:
       - ./frontend:/app
     ports:
       - "3000:3000"
-    command:
-      - python3
-      - -m
-      - http.server
-      - "3000"
+    environment:
+      - API_HOST=${API_HOST:-localhost}
+      - GAME_HOST=${GAME_HOST:-localhost}
+      - API_PORT=${AUTH_SERVICE_PORT:-8081}
+      - GAME_PORT=${GAME_SERVICE_PORT:-8082}
+    command: >
+      sh -c '
+        echo "window.APP_CONFIG = {" > /app/config.js;
+        echo "  AUTH_URL: \"http://${API_HOST}:${API_PORT}\"," >> /app/config.js;
+        echo "  GAME_WS_URL: \"ws://${GAME_HOST}:${GAME_PORT}/ws/connect\"" >> /app/config.js;
+        echo "};" >> /app/config.js;
+        exec python3 -m http.server 3000
+      '
 
 volumes:
   pgdata:
