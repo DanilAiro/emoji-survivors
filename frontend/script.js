@@ -46,20 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
     submitBtn.textContent = "Подождите...";
 
     try {
-      if (mode === "register") {
-        const res = await fetch(`${AUTH_URL}/api/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
-        });
-        if (!res.ok) {
-          const body = await safeJson(res);
-          throw new Error(body?.error || `Ошибка регистрации (${res.status})`);
-        }
-
-        autoSwitchTab();
-      }
-
       if (mode === "login") {
         const loginRes = await fetch(`${AUTH_URL}/api/login`, {
           method: "POST",
@@ -75,6 +61,20 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("emoji_survivor_token", token);
         localStorage.setItem("emoji_survivor_username", username);
         startGame(token, username);
+      }
+
+      if (mode === "register") {
+        const res = await fetch(`${AUTH_URL}/api/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        if (!res.ok) {
+          const body = await safeJson(res);
+          throw new Error(body?.error || `Ошибка регистрации (${res.status})`);
+        }
+
+        autoSwitchTab();
       }
     } catch (err) {
       authError.textContent = err.message || "Что-то пошло не так";
@@ -104,10 +104,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function autoSwitchTab() {
     let isFinish = false;
-    tabs.forEach(t => {
+    tabs.forEach((t) => {
       if (!t.classList.contains("active") && !isFinish) {
-          t.click();
-          isFinish = true;
+        t.click();
+        isFinish = true;
       }
     });
   }
