@@ -329,7 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // 4. Поворачиваем меч так, чтобы остриё было направлено от персонажа
       // Эмодзи 🗡 по умолчанию смотрит вправо, поэтому нужно повернуть на 180° (Math.PI)
-      ctx.rotate(Math.PI);
+      ctx.rotate(Math.PI / 2);
 
       ctx.font = "16px sans-serif";
       ctx.textAlign = "center";
