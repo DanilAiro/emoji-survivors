@@ -254,9 +254,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     drawGrid();
 
-    // for (const mob of latestState.mobs) {
-    //   drawEmoji("👾", mob.x, mob.y, 24);
-    // }
+    for (const mob of latestState.mobs) {
+      drawEmoji("👾", mob.x, mob.y, 24);
+    }
 
     for (const player of latestState.players) {
       if (player.hp <= 0) continue;
