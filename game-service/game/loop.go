@@ -59,7 +59,7 @@ func (g *GameLoop) resolveAttack(p *ws.Player) {
 func (g *GameLoop) resolveMobDamage(p *ws.Player) {
 	for _, m := range g.mobs {
 		if CirclesOverlap(m.X, m.Y, MobRadius, p.X, p.Y, ws.Radius) {
-			p.HP -= MobDamagePerTick
+			// p.HP -= MobDamagePerTick
 		}
 	}
 }
