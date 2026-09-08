@@ -311,7 +311,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function draw() {
       const elapsed = performance.now() - startTime;
-      const progress = Math.min(elapsed / 300, 1);
+      const progress = Math.min(elapsed / 1000, 1);
 
       // Угол орбиты (вокруг персонажа)
       const orbitAngle = progress * Math.PI * 2;
