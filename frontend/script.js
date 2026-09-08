@@ -262,6 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (player.hp <= 0) continue;
       const emoji = player.user_id === myUserId ? "🙂" : "🙃";
       drawEmoji(emoji, player.x, player.y, 28);
+      drawSword(player.x, player.y);
       drawUsername(player.username, player.x, player.y);
     }
 
@@ -291,6 +292,14 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(emoji, x, y);
+  }
+  
+  function drawSword(x, y) {
+    const sword = "🗡";
+    ctx.font = `16px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(sword, x - 14, y);
   }
 
   function drawUsername(name, x, y) {
