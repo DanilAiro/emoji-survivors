@@ -316,28 +316,26 @@ document.addEventListener("DOMContentLoaded", () => {
       // Угол орбиты (вокруг персонажа)
       const orbitAngle = progress * Math.PI * 2;
 
-      // Угол вращения меча вокруг своей оси (можно ускорить или замедлить)
-      const selfRotationAngle = progress * Math.PI * 2; // 2 оборота за время анимации
-
       ctx.save();
 
       // 1. Перемещаемся в центр персонажа
       ctx.translate(sword.x, sword.y);
 
-      // 2. Вращаем систему координат для орбиты
+      // 2. Вращаем систему координат на угол орбиты
       ctx.rotate(orbitAngle);
 
-      // 3. Смещаемся на радиус орбиты (позиция меча)
-      ctx.translate(orbitRadius, 0);
+      // 3. Смещаемся на радиус орбиты влево (меч появляется слева)
+      ctx.translate(-orbitRadius, 0);
 
-      // 4. Вращаем меч вокруг своей оси
-      ctx.rotate(selfRotationAngle);
+      // 4. Поворачиваем меч так, чтобы остриё было направлено от персонажа
+      // Эмодзи 🗡 по умолчанию смотрит вправо, поэтому нужно повернуть на 180° (Math.PI)
+      ctx.rotate(Math.PI);
 
       ctx.font = "16px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      // 5. Рисуем меч в (0, 0) — теперь он вращается и вокруг персонажа, и вокруг себя
+      // 5. Рисуем меч
       ctx.fillText(swordEmoji, 0, 0);
 
       ctx.restore();
