@@ -29,6 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let myUserId = null;
   let latestState = { players: [], mobs: [] };
 
+  let sword = { x: 0, y: 0 };
+
   // ==================== Экран аутентификации ====================
 
   tabs.forEach((tab) => {
@@ -228,7 +230,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  canvas.addEventListener("click", sendAttack);
+  canvas.addEventListener("click", () => {
+    drawSword();
+    sendAttack();
+  });
 
   function sendMove() {
     if (!socket || socket.readyState !== WebSocket.OPEN) return;
@@ -262,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (player.hp <= 0) continue;
       const emoji = player.user_id === myUserId ? "🙂" : "🙃";
       drawEmoji(emoji, player.x, player.y, 28);
-      drawSword(player.x, player.y);
+      updateSword(player.x, player.y);
       drawUsername(player.username, player.x, player.y);
     }
 
@@ -293,13 +298,37 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.textBaseline = "middle";
     ctx.fillText(emoji, x, y);
   }
-  
-  function drawSword(x, y) {
-    const sword = "🗡";
-    ctx.font = `16px sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(sword, x - 14, y);
+
+  function updateSword(x, y) {
+    sword.x = x;
+    sword.y = y;
+  }
+
+  function drawSword() {
+    const swordEmoji = "🗡";
+    const startTime = performance.now();
+
+    function draw() {
+      const elapsed = performance.now() - startTime;
+      const angle = ((elapsed % 1000) / 1000) * Math.PI * 2;
+
+      ctx.save();
+
+      ctx.translate(sword.x, sword.y);
+      ctx.rotate(angle);
+
+      ctx.font = "16px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      ctx.fillText(swordEmoji, -28, 0);
+
+      ctx.restore();
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
   }
 
   function drawUsername(name, x, y) {
