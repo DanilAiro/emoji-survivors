@@ -310,7 +310,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function draw() {
       const elapsed = performance.now() - startTime;
-      const angle = ((elapsed % 1000) / 1000) * Math.PI * 2;
+      const progress = Math.min(elapsed / 1000, 1);
+
+      // +180° — острие будет слева
+      const angle = progress * Math.PI * 2 + Math.PI;
 
       ctx.save();
 
@@ -325,7 +328,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       ctx.restore();
 
-      requestAnimationFrame(draw);
+      if (progress < 1) {
+        requestAnimationFrame(draw);
+      }
     }
 
     draw();
