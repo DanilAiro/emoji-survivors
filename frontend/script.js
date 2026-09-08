@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   canvas.addEventListener("click", () => {
-    drawSword();
+    // drawSword();
     sendAttack();
   });
 
@@ -304,40 +304,40 @@ document.addEventListener("DOMContentLoaded", () => {
     sword.y = y;
   }
 
-  function drawSword() {
-    const swordEmoji = "🗡";
-    const startTime = performance.now();
+  // function drawSword() {
+  //   const swordEmoji = "🗡";
+  //   const startTime = performance.now();
 
-    function draw() {
-      const elapsed = performance.now() - startTime;
-      const progress = Math.min(elapsed / 1000, 1);
+  //   function draw() {
+  //     const elapsed = performance.now() - startTime;
+  //     const progress = Math.min(elapsed / 1000, 1);
 
-      const angle = progress * Math.PI * 2;
+  //     const angle = progress * Math.PI * 2;
 
-      ctx.save();
+  //     ctx.save();
 
-      ctx.translate(sword.x, sword.y);
-      ctx.rotate(angle);
+  //     ctx.translate(sword.x, sword.y);
+  //     ctx.rotate(angle);
 
-      // Корректируем ориентацию emoji:
-      // 180° — острие влево
-      ctx.rotate(Math.PI);
+  //     // Корректируем ориентацию emoji:
+  //     // 180° — острие влево
+  //     ctx.rotate(Math.PI);
 
-      ctx.font = "16px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
+  //     ctx.font = "16px sans-serif";
+  //     ctx.textAlign = "center";
+  //     ctx.textBaseline = "middle";
 
-      ctx.fillText(swordEmoji, -28, 0);
+  //     ctx.fillText(swordEmoji, -28, 0);
 
-      ctx.restore();
+  //     ctx.restore();
 
-      if (progress < 1) {
-        requestAnimationFrame(draw);
-      }
-    }
+  //     if (progress < 1) {
+  //       requestAnimationFrame(draw);
+  //     }
+  //   }
 
-    draw();
-  }
+  //   draw();
+  // }
 
   function drawUsername(name, x, y) {
     ctx.font = "11px sans-serif";
