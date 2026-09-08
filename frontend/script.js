@@ -307,27 +307,38 @@ document.addEventListener("DOMContentLoaded", () => {
   function drawSword() {
     const swordEmoji = "🗡";
     const startTime = performance.now();
+    const orbitRadius = 28; // Расстояние от центра персонажа до меча
 
     function draw() {
       const elapsed = performance.now() - startTime;
       const progress = Math.min(elapsed / 300, 1);
 
-      const angle = progress * Math.PI * 2;
+      // Угол орбиты (вокруг персонажа)
+      const orbitAngle = progress * Math.PI * 2;
+
+      // Угол вращения меча вокруг своей оси (можно ускорить или замедлить)
+      const selfRotationAngle = progress * Math.PI * 2; // 2 оборота за время анимации
 
       ctx.save();
 
+      // 1. Перемещаемся в центр персонажа
       ctx.translate(sword.x, sword.y);
-      ctx.rotate(angle);
 
-      // Корректируем ориентацию emoji:
-      // 180° — острие влево
-      ctx.rotate(Math.PI);
+      // 2. Вращаем систему координат для орбиты
+      ctx.rotate(orbitAngle);
+
+      // 3. Смещаемся на радиус орбиты (позиция меча)
+      ctx.translate(orbitRadius, 0);
+
+      // 4. Вращаем меч вокруг своей оси
+      ctx.rotate(selfRotationAngle);
 
       ctx.font = "16px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      ctx.fillText(swordEmoji, -28, 0);
+      // 5. Рисуем меч в (0, 0) — теперь он вращается и вокруг персонажа, и вокруг себя
+      ctx.fillText(swordEmoji, 0, 0);
 
       ctx.restore();
 
