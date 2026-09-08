@@ -312,13 +312,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const elapsed = performance.now() - startTime;
       const progress = Math.min(elapsed / 1000, 1);
 
-      // +180° — острие будет слева
-      const angle = progress * Math.PI * 2 + Math.PI;
+      const angle = progress * Math.PI * 2;
 
       ctx.save();
 
       ctx.translate(sword.x, sword.y);
       ctx.rotate(angle);
+
+      // Корректируем ориентацию emoji:
+      // 180° — острие влево
+      ctx.rotate(Math.PI);
 
       ctx.font = "16px sans-serif";
       ctx.textAlign = "center";
